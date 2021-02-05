@@ -351,20 +351,22 @@ ctcoreapp.globalSearch = {
                 category: [category],
                 items: []
             };
-            var handleError = () => {
-                console.log(`Error getting results for ${category}: ${solrUrl}`);
+            var handleNoResults = () => {
+                console.log(`No results returned for ${category}: ${solrUrl}`);
                 resolve(results);
             };
             var xhr = new XMLHttpRequest();
             xhr.open('GET', solrUrl, true);
             xhr.onload = e => {
-                if (xhr.status !== 200) handleError();
+                if (xhr.status !== 200)
+                    return handleNoResults();
                 const payload = JSON.parse(e.target.response);
-                if (!payload || !payload[category]) handleError();
+                if (!payload || !payload[category])
+                    return handleNoResults();
                 results.items = payload[category];
                 resolve(results);
             };
-            xhr.onerror = () => handleError();
+            xhr.onerror = () => handleNoResults();
             xhr.send(null);
         });
     },
